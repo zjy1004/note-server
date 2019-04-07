@@ -62,8 +62,19 @@ router.patch('/article/:id', async (req, res, next) => { // 修改文章
     }
 });
 
-router.get('/article', (req, res) => {
-    let {pn = 1, size = 10} = req.query;
+router.post('/articleContent', (req, res) => { // 获取文章
+    let reg = /(\d{4})-(\d{2})-(\d{2})/
+    let {pn = 1, size = 10, categoryId, updateTime} = req.body;
+    let time
+    if (req.body.updateTime == "") {
+        time = ""
+        console.log('000000')
+    } else {
+        console.log('11111')
+        time = reg.exec(req.body.updateTime)[0]
+    }
+    console.log(categoryId)
+    console.log('111',time)
     pn = parseInt(pn);
     size = parseInt(size);
 
@@ -78,14 +89,95 @@ router.get('/article', (req, res) => {
         .populate({
             path: 'category'
         })
-        .then(data => {
-            res.json({
-                code: 200,
-                data
-            })
+        .then(data =>{
+            if (categoryId == ""){
+                if(time == ""){
+                    console.log('无时间无分类');
+                    res.json({
+                        code:200,
+                        data
+                    })
+                }else{
+                    console.log('有时间无分类');
+                    Date.prototype.Format = function (fmt) {
+                        var o = {
+                                "M+": this.getMonth() + 1, // 月份
+                                "d+": this.getDate(), // 日
+                                "h+": this.getHours(), // 小时
+                                "m+": this.getMinutes(), // 分
+                                "s+": this.getSeconds(), // 秒
+                                "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+                                "S": this.getMilliseconds() // 毫秒
+                        };
+                    if (/(y+)/.test(fmt))
+                        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + ""));
+                    for (var k in o)
+                        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                    return fmt;
+                }
+                let newData = []
+                data.forEach(item => {
+                    if(time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]){
+                        console.log(reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]);
+                        newData.push(item)
+                    }
+                });
+                data = newData
+                res.json({
+                    code:200,
+                    data
+                });
+                }
+            }else{
+                if(time == ""){
+                    console.log('有分类无时间');
+                    let newData = []
+                    data.forEach(item => {
+                        if(categoryId == item.category._id){
+                            newData.push(item)
+                        }
+                    });
+                    data = newData
+                    res.json({
+                        code:200,
+                        data
+                    });
+                }else{
+                    console.log('都有');
+                    Date.prototype.Format = function (fmt) {
+                        var o = {
+                                "M+": this.getMonth() + 1, // 月份
+                                "d+": this.getDate(), // 日
+                                "h+": this.getHours(), // 小时
+                                "m+": this.getMinutes(), // 分
+                                "s+": this.getSeconds(), // 秒
+                                "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+                                "S": this.getMilliseconds() // 毫秒
+                        };
+                        if (/(y+)/.test(fmt))
+                            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + ""));
+                        for (var k in o)
+                            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                        return fmt;
+                    }
+        
+                    let newData = []
+                    data.forEach(item => {
+                        if(categoryId == item.category._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]){
+                            newData.push(item)
+                        }
+                    });
+                    data = newData
+                    res.json({
+                        code:200,
+                        data
+                    });
+                }
+            }
+
         })
 });
-router.get('/article/:id', (req, res) => { // 获取单条文章
+router.get('/articleById/:id', (req, res) => { // 获取单条文章
     const {id} = req.params;
     articleModel.findById(id)
         .populate({
@@ -103,24 +195,7 @@ router.get('/article/:id', (req, res) => { // 获取单条文章
     })
 
 });
-router.get('/article/:categoryId', (req, res) => { // 获取分类文章
-  const { id } = req.params;
-  articleModel.findById(id)
-    .populate({
-      path: 'author',
-      select: '-password'
-    })
-    .populate({
-      path: 'category'
-    })
-    .then(data => {
-      res.json({
-        code: 200,
-        data
-      })
-    })
 
-});
 router.delete('/article/:id', (req, res) => { // 删除文章
     const {id} = req.params;
     articleModel.findById(id)

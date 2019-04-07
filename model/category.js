@@ -5,6 +5,10 @@ const category = new mongoose.Schema({
         type: String,
         unique: true
     }
-}, {versionKey: false});
+}, {versionKey: false, timestamps: {
+    createdAt: 'createTime',
+    updatedAt: 'updateTime'
+  }}
+);
 
 module.exports = mongoose.model("category", category);

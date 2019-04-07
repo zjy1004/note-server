@@ -5,8 +5,6 @@ const article = new mongoose.Schema({
     title: String,
     content: String,
     contentText: String,
-    createTime: String,
-    updateTime: String,
     author: {
         type: Schema.Types.ObjectId,
         ref: 'user'

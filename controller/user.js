@@ -8,7 +8,6 @@ router.post('/user', async(req, res) => { // 注册
         const {username, password, email} = req.body;
         const avatarNumber = Math.ceil(Math.random()*9);
         const avatar = `http://pbl.yaojunrong.com/avatar${avatarNumber}.jpg`;
-        // const avatar = `http://img5.duitang.com/uploads/item/201409/23/20140923094045_BNYji.thumb.700_0.png`;
 
         if (password&&password.length>=5) {
           const data = await userModel.create({ username, password, email, avatar});

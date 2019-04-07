@@ -11,7 +11,7 @@ router.get('/category', (req, res) => { // 获取分类
     })
 });
 
-router.get('/category/:id', (req, res) => {
+router.get('/category/:id', (req, res) => { // 获取分类详情
     let {id} = req.params;
     categoryModel.findById(id).then(data => {
         res.json({

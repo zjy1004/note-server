@@ -8,8 +8,6 @@ const user = new mongoose.Schema({
         unique: true,
         required: true
     },
-    createTime: String,
-    updateTime: String,
     password: String,
     desc: String,
 }, {versionKey: false, timestamps: {createdAt: 'createTime',
