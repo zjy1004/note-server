@@ -5,9 +5,9 @@ const session = require('express-session');
 
 router.post('/user', async(req, res) => { // 注册
     try {
-        const {username, password, email} = req.body;
-        const avatarNumber = Math.ceil(Math.random()*9);
-        const avatar = `http://pbl.yaojunrong.com/avatar${avatarNumber}.jpg`;
+        const {username, password, email, avatar} = req.body;
+        // const avatarNumber = Math.ceil(Math.random()*9);
+        // const avatar = `http://pbl.yaojunrong.com/avatar${avatarNumber}.jpg`;
 
         if (password&&password.length>=5) {
           const data = await userModel.create({ username, password, email, avatar});
