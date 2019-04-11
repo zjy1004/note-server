@@ -7,13 +7,14 @@ const session = require('express-session');
 router.post('/article', async (req, res, next) => { // 添加文章
     try {
         if (req.session.user) {
-            const {content, contentText, title, category} = req.body;
+            const {content, contentText, title, category, img} = req.body;
             const data = await articleModel.
             create({
                 content,
                 contentText,
                 title,
                 category,
+                img,
                 author: req.session.user._id,
             });
             res.json({
