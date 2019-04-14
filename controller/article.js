@@ -201,6 +201,7 @@ router.post('/articleContent', (req, res) => { // 获取文章
 });
 router.get('/articleById/:id', (req, res) => { // 获取单条文章
     const {id} = req.params;
+
     articleModel.findById(id)
         .populate({
             path: 'author',
@@ -210,14 +211,59 @@ router.get('/articleById/:id', (req, res) => { // 获取单条文章
             path: 'category'
         })
         .then(data => {
-        res.json({
-            code: 200,
-            data
-        })
+            let number = data.readnumber + 1
+             // 更新浏览数
+            articleModel.update({_id:id},{$set:{readnumber:number}},function(err,doc){})
+            res.json({
+                code: 200,
+                data
+            })
     })
-
 });
-
+router.patch('/addCommonnum/:id', async (req, res, next) => { // 点赞
+    try {
+        if (req.session.user) {
+            const {id} = req.params;
+            let data = await articleModel.findById(id)
+            const commonnum = data.commonnum + 1
+            articleModel.update({_id:id},{$set:{commonnum}},function(err,doc){})
+            res.json({
+                code: 200,
+                msg: '点赞成功',
+                data
+            })
+        } else {
+            res.json({
+                code: 403,
+                msg: '未登录状态下，不能点赞'
+            })
+        }
+    } catch (err) {
+        next(err)
+    }
+});
+router.patch('/reduceCommonnum/:id', async (req, res, next) => { // 取消点赞
+    try {
+        if (req.session.user) {
+            const {id} = req.params;
+            const data = await articleModel.findById(id)
+            const commonnum = data.commonnum - 1
+            articleModel.update({_id:id},{$set:{commonnum}},function(err,doc){})
+            res.json({
+                code: 200,
+                msg: '取消成功',
+                data: data
+            })
+        } else {
+            res.json({
+                code: 403,
+                msg: '未登录状态下，不能取消'
+            })
+        }
+    } catch (err) {
+        next(err)
+    }
+});
 router.delete('/article/:id', (req, res) => { // 删除文章
     const {id} = req.params;
     articleModel.findById(id)
