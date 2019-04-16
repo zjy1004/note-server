@@ -9,7 +9,14 @@ const user = new mongoose.Schema({
         required: true
     },
     password: String,
-    desc: String,
+    desc: {
+      type: String,
+      default: ''
+    },
+    sex: {
+      type: String,
+      default: ''
+    }
 }, {versionKey: false, timestamps: {createdAt: 'createTime',
         updatedAt: 'updateTime' }});
 

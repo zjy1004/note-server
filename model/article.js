@@ -5,11 +5,11 @@ const article = new mongoose.Schema({
     title: String,
     content: String,
     contentText: String,
-    img: String,
     author: {
         type: Schema.Types.ObjectId,
         ref: 'user'
     },
+    img: String,
     category: {
         type: Schema.Types.ObjectId,
         ref: 'category'
@@ -21,6 +21,10 @@ const article = new mongoose.Schema({
     commonnum: {
         type: Number,
         default: 0
+    },
+    isPraise: {
+      type: Number,
+      default: 0
     }
 }, {
   versionKey: false, timestamps: {

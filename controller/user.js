@@ -5,7 +5,7 @@ const session = require('express-session');
 
 router.post('/user', async(req, res) => { // 注册
     try {
-        const {username, password, email, avatar} = req.body;
+      const { username, password, email, avatar} = req.body;
         // const avatarNumber = Math.ceil(Math.random()*9);
         // const avatar = `http://pbl.yaojunrong.com/avatar${avatarNumber}.jpg`;
 
@@ -27,10 +27,75 @@ router.post('/user', async(req, res) => { // 注册
         });
     }
 });
+router.post('/editUser', async (req, res, next) => { // 修改个人信息
+  try {
+    if (req.session.user) {
+      let id = req.session.user._id
+      const { username, avatar, desc, sex } = req.body
+      let data = await userModel.update({ _id: id }, {
+        $set: {
+          username,
+          avatar,
+          desc,
+          sex,
+        }
+      }, function (err, doc) { })
+      res.json({
+        code: 200,
+        msg: '修改成功',
+        data
+      })
+    } else {
+      res.json({
+        code: 403,
+        msg: '未登录状态下，不能修改'
+      })
+    }
+  } catch (err) {
+    next(err)
+  }
+});
+router.post('/editPwd', async (req, res, next) => { // 修改密码
+  try {
+    if (req.session.user) {
+      let id = req.session.user._id
+      const { newPassword, oldPassword } = req.body
+      if (oldPassword !== req.session.user.password) {
+        res.json({
+          code: 401,
+          msg: '原密码错误，重新输入'
+        })
+      } else {
+        if (newPassword === req.session.user.password) {
+          res.json({
+            code: 401,
+            msg: '新旧密码相同，请重新输入'
+          })
+        } else {
+          console.log(newPassword)
+          let data = await userModel.update({ _id: id }, { $set: { 'password': newPassword } }, function (err, doc) { })
+          res.json({
+            code: 200,
+            msg: '修改成功',
+            data
+          })
+        }
+      }
+    } else {
+      res.json({
+        code: 403,
+        msg: '未登录状态下，不能修改'
+      })
+    }
+  } catch (err) {
+    next(err)
+  }
+});
 router.post('/login', async(req, res) => { // 登陆
     try {
         const {email, password} = req.body;
         const userData = await userModel.findOne({email});
+        console.log(userData)
         if (!userData) {
             res.json({
                 code: 400,
@@ -45,8 +110,9 @@ router.post('/login', async(req, res) => { // 登陆
                     userData: {
                         avatar: userData.avatar,
                         email: userData.email,
-                        dec: userData.dec,
-                        username: userData.username
+                        desc: userData.desc,
+                        username: userData.username,
+                        sex: userData.sex,
                     }
                 })
             } else {
