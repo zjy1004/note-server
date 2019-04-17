@@ -65,7 +65,6 @@ router.patch('/article/:id', async (req, res, next) => { // 修改文章
 });
 
 router.post('/articleContent', (req, res) => { // 获取个人文章
-    // console.log(req.session)
     if (req.session.user) {
         console.log('有session')
 
@@ -102,7 +101,6 @@ router.post('/articleContent', (req, res) => { // 获取个人文章
                     if(time == ""){
                         // console.log(data)
                         console.log('无时间无分类');
-                        console.log(data);
                         let newData = []
                         data.forEach(item => {
                             if(userId == item.author._id){
@@ -204,6 +202,8 @@ router.post('/articleContent', (req, res) => { // 获取个人文章
 });
 router.post('/allArticleContent', (req, res) => { // 获取全部文章
   if (req.session.user) {
+    console.log('有session')
+
     let reg = /(\d{4})-(\d{2})-(\d{2})/
     let { pn = 1, size = 10, categoryId, updateTime } = req.body;
     let time
@@ -214,6 +214,8 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
       console.log('无时间')
       time = reg.exec(req.body.updateTime)[0]
     }
+    let userId = req.session.user._id
+    console.log('22222222222', userId)
     console.log(categoryId)
     console.log('111', time)
     pn = parseInt(pn);
@@ -233,8 +235,14 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
       .then(data => {
         if (categoryId == "") {
           if (time == "") {
-            // console.log(data)
-            console.log('无时间无分类')
+            console.log('无时间无分类');
+            let newData = []
+            data.forEach(item => {
+              if (userId != item.author._id) {
+                newData.push(item)
+              }
+            });
+            data = newData
             res.json({
               code: 200,
               data
@@ -259,8 +267,8 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
             }
             let newData = []
             data.forEach(item => {
-              console.log('有时间无分类')
-              if (time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
+              console.log('有时间五分类')
+              if (userId != item.author._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
                 console.log(reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]);
                 newData.push(item)
               }
@@ -276,7 +284,7 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
             console.log('有分类无时间');
             let newData = []
             data.forEach(item => {
-              if (categoryId == item.category._id) {
+              if (userId != item.author._id && categoryId == item.category._id) {
                 newData.push(item)
               }
             });
@@ -306,7 +314,7 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
 
             let newData = []
             data.forEach(item => {
-              if (categoryId == item.category._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
+              if (userId != item.author._id && categoryId == item.category._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
                 newData.push(item)
               }
             });
@@ -351,12 +359,14 @@ router.get('/articleById/:id', (req, res) => { // 获取单条文章
 router.patch('/addCommonnum/:id', async (req, res, next) => { // 点赞
     try {
         if (req.session.user) {
-          console.log(req.session)
             const {id} = req.params;
             let data = await articleModel.findById(id)
             const commonnum = data.commonnum + 1
             const isPraise = 1
-          articleModel.update({ _id: id }, { $set: { commonnum, isPraise}},function(err,doc){})
+            let userId = req.session.user._id
+            let praiseList = data.praiseList
+            praiseList.push(userId)
+          articleModel.update({ _id: id }, { $set: { commonnum, isPraise, praiseList}},function(err,doc){})
             res.json({
                 code: 200,
                 msg: '点赞成功',
@@ -379,7 +389,12 @@ router.patch('/reduceCommonnum/:id', async (req, res, next) => { // 取消点赞
             const data = await articleModel.findById(id)
             const commonnum = data.commonnum - 1
             const isPraise = 0
-            articleModel.update({_id:id},{$set:{commonnum, isPraise}},function(err,doc){})
+            let userId = req.session.user._id
+            let praiseList = data.praiseList.filter(item => {
+              return item != userId
+            })
+            console.log(praiseList)
+            articleModel.update({_id:id},{$set:{commonnum, isPraise, praiseList}},function(err,doc){})
             res.json({
                 code: 200,
                 msg: '取消成功',

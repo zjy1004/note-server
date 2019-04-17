@@ -25,6 +25,10 @@ const article = new mongoose.Schema({
     isPraise: {
       type: Number,
       default: 0
+    },
+    praiseList: {
+      type: Array,
+      default: []
     }
 }, {
   versionKey: false, timestamps: {

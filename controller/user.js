@@ -95,7 +95,6 @@ router.post('/login', async(req, res) => { // 登陆
     try {
         const {email, password} = req.body;
         const userData = await userModel.findOne({email});
-        console.log(userData)
         if (!userData) {
             res.json({
                 code: 400,
@@ -108,11 +107,12 @@ router.post('/login', async(req, res) => { // 登陆
                     code: 200,
                     msg: '登陆成功',
                     userData: {
-                        avatar: userData.avatar,
-                        email: userData.email,
-                        desc: userData.desc,
-                        username: userData.username,
-                        sex: userData.sex,
+                      userId: userData._id,
+                      avatar: userData.avatar,
+                      email: userData.email,
+                      desc: userData.desc,
+                      username: userData.username,
+                      sex: userData.sex,
                     }
                 })
             } else {
