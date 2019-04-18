@@ -40,13 +40,15 @@ router.patch('/article/:id', async (req, res, next) => { // 修改文章
                 content,
                 contentText,
                 title,
+                img,
                 category} = req.body;
             const data = await articleModel.findById(id)
             const updateData = await data.update({$set: {
                 content,
                 contentText,
                 title,
-                category
+                category,
+                img
             }})
             res.json({
                 code: 200,

@@ -31,7 +31,7 @@ router.post('/editUser', async (req, res, next) => { // 修改个人信息
   try {
     if (req.session.user) {
       let id = req.session.user._id
-      const { username, avatar, desc, sex } = req.body
+      const { username, avatar, desc, sex, email } = req.body
       let data = await userModel.update({ _id: id }, {
         $set: {
           username,
@@ -40,10 +40,18 @@ router.post('/editUser', async (req, res, next) => { // 修改个人信息
           sex,
         }
       }, function (err, doc) { })
+      const userData = await userModel.findOne({ email });
       res.json({
         code: 200,
         msg: '修改成功',
-        data
+        userData: {
+          userId: userData._id,
+          avatar: userData.avatar,
+          email: userData.email,
+          desc: userData.desc,
+          username: userData.username,
+          sex: userData.sex,
+        }
       })
     } else {
       res.json({
