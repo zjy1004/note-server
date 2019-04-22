@@ -71,14 +71,14 @@ router.post('/articleContent', (req, res) => { // 获取个人文章
         console.log('有session')
 
         let reg = /(\d{4})-(\d{2})-(\d{2})/
-        let {pn = 1, size = 10, categoryId, updateTime} = req.body;
+        let {pn = 1, size = 10, categoryId, createTime} = req.body;
         let time
-        if (req.body.updateTime == "") {
+        if (req.body.createTime == "") {
             time = ""
             console.log('有时间')
         } else {
             console.log('无时间')
-            time = reg.exec(req.body.updateTime)[0]
+            time = reg.exec(req.body.createTime)[0]
         }
         let userId = req.session.user._id
         console.log('22222222222', userId)
@@ -135,8 +135,8 @@ router.post('/articleContent', (req, res) => { // 获取个人文章
                     let newData = []
                     data.forEach(item => {
                         console.log('有时间五分类')
-                        if(userId == item.author._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]){
-                            console.log(reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]);
+                        if(userId == item.author._id && time == reg.exec(new Date(Number(item.createTime)).Format('yy-MM-dd hh:mm:ss'))[0]){
+                            console.log(reg.exec(new Date(Number(item.createTime)).Format('yy-MM-dd hh:mm:ss'))[0]);
                             newData.push(item)
                         }
                     });
@@ -181,7 +181,7 @@ router.post('/articleContent', (req, res) => { // 获取个人文章
             
                         let newData = []
                         data.forEach(item => {
-                            if(userId == item.author._id && categoryId == item.category._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]){
+                            if(userId == item.author._id && categoryId == item.category._id && time == reg.exec(new Date(Number(item.createTime)).Format('yy-MM-dd hh:mm:ss'))[0]){
                                 newData.push(item)
                             }
                         });
@@ -207,14 +207,14 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
     console.log('有session')
 
     let reg = /(\d{4})-(\d{2})-(\d{2})/
-    let { pn = 1, size = 10, categoryId, updateTime } = req.body;
+    let { pn = 1, size = 10, categoryId, createTime } = req.body;
     let time
-    if (req.body.updateTime == "") {
+    if (req.body.createTime == "") {
       time = ""
       console.log('有时间')
     } else {
       console.log('无时间')
-      time = reg.exec(req.body.updateTime)[0]
+      time = reg.exec(req.body.createTime)[0]
     }
     let userId = req.session.user._id
     console.log('22222222222', userId)
@@ -270,8 +270,8 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
             let newData = []
             data.forEach(item => {
               console.log('有时间五分类')
-              if (userId != item.author._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
-                console.log(reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]);
+              if (userId != item.author._id && time == reg.exec(new Date(Number(item.createTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
+                console.log(reg.exec(new Date(Number(item.createTime)).Format('yy-MM-dd hh:mm:ss'))[0]);
                 newData.push(item)
               }
             });
@@ -316,7 +316,7 @@ router.post('/allArticleContent', (req, res) => { // 获取全部文章
 
             let newData = []
             data.forEach(item => {
-              if (userId != item.author._id && categoryId == item.category._id && time == reg.exec(new Date(Number(item.updateTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
+              if (userId != item.author._id && categoryId == item.category._id && time == reg.exec(new Date(Number(item.createTime)).Format('yy-MM-dd hh:mm:ss'))[0]) {
                 newData.push(item)
               }
             });
