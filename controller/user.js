@@ -5,20 +5,32 @@ const session = require('express-session');
 
 router.post('/user', async(req, res) => { // 注册
     try {
-      const { username, password, email, avatar} = req.body;
+      const { username, password, email, avatar, tel} = req.body;
         // const avatarNumber = Math.ceil(Math.random()*9);
         // const avatar = `http://pbl.yaojunrong.com/avatar${avatarNumber}.jpg`;
-
-        if (password&&password.length>=5) {
-          const data = await userModel.create({ username, password, email, avatar});
-            res.json({
-                code: 200,
-                msg: '注册成功'
-            })
-        }else {
-            throw '密码长度不符合要求'
+       const telData = await userModel.find()
+        .then(telData => {
+         let haveTel = telData.some(item => {
+          return item.tel == req.body.tel
+        })
+        if (haveTel) {
+          res.json({
+            code: 403,
+            msg: '手机号已注册，请更换手机号',
+            telData
+          })
+        } else {
+          if (password&&password.length>=5) {
+            const data = userModel.create({ username, password, email, avatar, tel});
+              res.json({
+                  code: 200,
+                  msg: '注册成功'
+              })
+          }else {
+              throw '密码长度不符合要求'
+          }
         }
-
+      })
     } catch(err) {
         res.json({
             code: 400,

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://119.23.15.173', {
+// mongoose.connect('mongodb://119.23.15.173', {
+mongoose.connect('mongodb://localhost/e-home', {
     useNewUrlParser: true
 });
 
